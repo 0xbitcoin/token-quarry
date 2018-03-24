@@ -42,7 +42,11 @@ contract TokenQuarry {
 
   //address of the token contract
   address miningLeader = 0x0;
+
+  //A value of 20 means the reward is 1/20 (5%) of current tokens held in the quarry
   uint rewardDivisor = 20;
+
+  //number of times this has been mined
   uint epochCount = 0;
 
   mapping(bytes32 => bytes32) solutionForChallenge;
@@ -60,10 +64,10 @@ contract TokenQuarry {
    }
 
 
-   event MineQuarry(address indexed from,  uint epochCount, bytes32 newChallengeNumber);
+   event Mined(address indexed from,  uint epochCount, bytes32 newChallengeNumber);
 
 
-   function mineQuarry(uint256 nonce, bytes32 challenge_digest,address[] tokens) public returns (bool success) {
+   function mineQuarry(uint256 nonce, bytes32 challenge_digest, address[] tokens) public returns (bool success) {
 
      bytes32 challengeNumber = getChallengeNumber();
      uint miningTarget = getMiningTarget();
@@ -112,7 +116,7 @@ contract TokenQuarry {
 
       epochCount = epochCount.add(1);
 
-       MineQuarry(msg.sender,  epochCount, challengeNumber );
+       Mined(msg.sender,  epochCount, challengeNumber );
 
     return true;
 
