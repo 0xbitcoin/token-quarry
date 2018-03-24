@@ -5,6 +5,8 @@ pragma solidity ^0.4.18;
 
 An ERC20 token wallet which dispenses tokens via Proof of Work mining.
 
+Anyone can deposit any ERC20 token in this contract and they will be locked inside.   0xBitcoin miners can submit their solutions to this contract when they submit their solutions to the 0xBitcoin contract and they will then be rewarded with 5% of the ERC20 tokens of their choice which are stored in this contract. 
+
 */
 
 import "./SafeMath.sol";
