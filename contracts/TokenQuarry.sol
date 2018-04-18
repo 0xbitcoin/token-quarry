@@ -72,60 +72,26 @@ contract TokenQuarry {
 
    function mineQuarry(uint256 nonce, bytes32 challenge_digest, address[] tokens) public returns (bool success) {
 
-     bytes32 challengeNumber = getChallengeNumber();
-     uint miningTarget = getMiningTarget();
+     bool mintSuccess = mintMiningLeader(nonce, challenge_digest);
+     if(!mintSuccess) revert();
 
-     //the PoW must contain work that includes a recent ethereum block hash (challenge number) and the msg.sender's address to prevent MITM attacks
-     bytes32 digest =  keccak256(challengeNumber, msg.sender, nonce );
+     for (uint i = 0; i < tokens.length; i++)
+     {
+       giveReward(tokens[i],msg.sender);
+     }
 
-     //the challenge digest must match the expected
-     if (digest != challenge_digest) revert();
+     epochCount = epochCount.add(1);
 
-     //the digest must be smaller than the target
-     if(uint256(digest) > miningTarget) revert();
-
-     //only allow one reward for each challenge
-      bytes32 solution = solutionForChallenge[challengeNumber];
-      solutionForChallenge[challengeNumber] = digest;
-      if(solution != 0x0) revert();  //prevent the same answer from awarding twice
-
-      for (uint i = 0; i < tokens.length; i++)
-      {
-        giveReward(tokens[i],msg.sender);
-      }
-
-
-      /*
-     uint reward_amount = getMiningReward();
-
-     balances[msg.sender] = balances[msg.sender].add(reward_amount);
-
-     tokensMinted = tokensMinted.add(reward_amount);
-
-     //Cannot mint more tokens than there are
-     assert(tokensMinted <= maxSupplyForEra);
-
-
-
-
-     //set readonly diagnostics data
-     lastRewardTo = msg.sender;
-     lastRewardAmount = reward_amount;
-     lastRewardEthBlockNumber = block.number;
-
-     */
-
-      //_startNewMiningEpoch();
-
-      epochCount = epochCount.add(1);
-
-       Mined(msg.sender,  epochCount, challengeNumber );
+     Mined(msg.sender,  epochCount, challengeNumber );
 
     return true;
 
  }
 
 
+function mintMiningLeader(uint256 nonce, bytes32 challenge_digest) public constant returns (bool) {
+  return EIP918Interface(miningLeader).mint(nonce,challenge_digest);
+}
 
 function getChallengeNumber() public constant returns (bytes32) {
   return EIP918Interface(miningLeader).getChallengeNumber();
