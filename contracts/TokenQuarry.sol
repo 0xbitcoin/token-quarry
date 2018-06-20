@@ -113,6 +113,7 @@ function getRewardAmount(address token) public constant returns (uint)
 }
 
 function giveReward(address tokenAddress,address recipient)
+private
 {
      uint amount = getRewardAmount(tokenAddress);
 
